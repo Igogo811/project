@@ -1,0 +1,130 @@
+import os
+from glob import glob
+import csv
+
+
+
+class PriceMachine():
+    
+    def __init__(self):
+        self.data = []
+        self.result = ''
+        self.name_length = 0
+    
+    def load_prices(self, file_path=r'C:\Users\MLM\PycharmProjects\pythonProject3\pythonProject\venv4\Practik'):
+        file_names = [fname for fname in glob(os.path.join(file_path, '*price*')) if os.path.isfile(fname)]
+
+        fields = ['Наименование', 'Цена', 'Вес', 'Файл', 'Цена за кг']
+
+        # Открытие файла для записи заголовков
+        with open('pric_all.csv', 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(fields)
+
+        for file_name in file_names:
+            source_file = os.path.basename(file_name)
+            
+
+            # Открытие файла для чтения
+            with open(file_name, 'r', newline='', encoding='utf-8') as csvfile:
+                # Создание объекта reader, который будет читать файл
+                csv_reader = csv.DictReader(csvfile)
+
+                # Перебор каждой строки в файле
+                for row in csv_reader:
+                    if 'продукт' in row:
+                        prodakt_field = 'продукт'
+                    elif 'товар' in row:
+                        prodakt_field = 'товар'
+                    elif 'название' in row:
+                        prodakt_field = 'название'
+                    elif 'наименование' in row:
+                        prodakt_field = 'наименование'
+
+                    if 'розница' in row:
+                        price_field = 'розница'
+                    elif 'цена' in row:
+                        price_field = 'цена'
+
+                    if 'фасовка' in row:
+                        weight_field = 'фасовка'
+                    elif 'вес' in row:
+                        weight_field = 'вес'
+                    elif 'масса' in row:
+                        weight_field = 'масса'
+
+                    
+
+                    # Считаем цену товара за кг
+                    price_per_kg = round(float(row[price_field]) / float(row[weight_field]), 2)
+
+                    with open('pric_all.csv', 'a', newline='', encoding='utf-8') as pa_file:
+                        writer = csv.writer(pa_file)
+                        # Запись строк в файл
+                        writer.writerow([row[prodakt_field], row[price_field], row[weight_field],
+                                          source_file, price_per_kg])
+
+                # print('*' * 130)
+
+
+    def _search_product_price_weight(self, heders):
+        pass
+        '''
+            Возвращает номера столбцов
+        '''
+
+    def export_to_html(self, fname='output.html'):
+        result = '''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Позиции продуктов</title>
+        </head>
+        <body>
+            <table>
+                <tr>
+                    <th>Номер</th>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Фасовка</th>
+                    <th>Файл</th>
+                    <th>Цена за кг.</th>
+                </tr>
+        '''
+    
+    def find_text(self):
+        while True:
+            user_input = input("Введите слово для поиска или 'выход' для выхода: ")
+            if user_input == "выход":
+                print("Работа программы завершена.")
+                break
+            else:
+                # Открытие файла для чтения
+                with open('pric_all.csv', 'r', newline='', encoding='utf-8') as csvfile:
+                    # Создание объекта reader, который будет читать файл
+                    csv_reader = csv.reader(csvfile)
+                    intermediate_row = []
+                    for row in csv_reader:
+                        if user_input in row[0].lower():
+                            intermediate_row.append(row)
+
+                with open('result_file.csv', 'w', newline='', encoding='utf-8') as res_file:
+                    writer = csv.writer(res_file)
+
+                    # Сортируем по цене за кг
+                    sorted_rows = sorted(intermediate_row, key=lambda row: row[4], reverse=False)
+                    # Запись отсортированных строк в файл
+                    for row in sorted_rows:
+                        writer.writerow(row)
+                        print(row)
+
+
+    
+pm = PriceMachine()
+pm.load_prices()
+pm.find_text()
+'''
+    Логика работы программы
+'''
+
+print(pm.export_to_html())
