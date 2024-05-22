@@ -112,7 +112,7 @@ class PriceMachine():
                     writer = csv.writer(res_file)
 
                     # Сортируем по цене за кг
-                    sorted_rows = sorted(intermediate_row, key=lambda row: row[4], reverse=False)
+                    sorted_rows = sorted(intermediate_row, key=lambda row: float(row[4]), reverse=False)
                     # Запись отсортированных строк в файл
                     for row in sorted_rows:
                         writer.writerow(row)
