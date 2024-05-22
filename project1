@@ -3,14 +3,13 @@ from glob import glob
 import csv
 
 
-
 class PriceMachine():
-    
+
     def __init__(self):
         self.data = []
         self.result = ''
         self.name_length = 0
-    
+
     def load_prices(self, file_path=r'C:\Users\MLM\PycharmProjects\pythonProject3\pythonProject\venv4\Practik'):
         file_names = [fname for fname in glob(os.path.join(file_path, '*price*')) if os.path.isfile(fname)]
 
@@ -23,7 +22,6 @@ class PriceMachine():
 
         for file_name in file_names:
             source_file = os.path.basename(file_name)
-            
 
             # Открытие файла для чтения
             with open(file_name, 'r', newline='', encoding='utf-8') as csvfile:
@@ -53,19 +51,14 @@ class PriceMachine():
                     elif 'масса' in row:
                         weight_field = 'масса'
 
-                    
-
                     # Считаем цену товара за кг
                     price_per_kg = round(float(row[price_field]) / float(row[weight_field]), 2)
-
+                    # Открытие файла для добавления
                     with open('pric_all.csv', 'a', newline='', encoding='utf-8') as pa_file:
                         writer = csv.writer(pa_file)
                         # Запись строк в файл
                         writer.writerow([row[prodakt_field], row[price_field], row[weight_field],
-                                          source_file, price_per_kg])
-
-                # print('*' * 130)
-
+                                         source_file, price_per_kg])
 
     def _search_product_price_weight(self, heders):
         pass
@@ -74,24 +67,45 @@ class PriceMachine():
         '''
 
     def export_to_html(self, fname='output.html'):
-        result = '''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Позиции продуктов</title>
-        </head>
-        <body>
-            <table>
-                <tr>
-                    <th>Номер</th>
-                    <th>Название</th>
-                    <th>Цена</th>
-                    <th>Фасовка</th>
-                    <th>Файл</th>
-                    <th>Цена за кг.</th>
-                </tr>
-        '''
-    
+
+        with (open('result_file.csv', newline='', encoding='utf-8') as csvfile):
+            # Создание объекта reader для чтения файла
+            csv_reader = csv.reader(csvfile)
+
+            html_output = ('<!DOCTYPE html>'
+                           '< html >'
+                           '< head >'
+                           '<title>Позиции продуктов</title>'
+                           '</head>'
+                           '<body>'
+                           '<table>'
+                           '<tr>'
+                           '<th> № </th>'
+                           '<th>   Название   </th>'
+                           '<th>  Цена  </th>'
+                           '<th> Фасовка </th>'
+                           '<th>    Файл    </th>'
+                           '<th> Цена за кг. </th>'
+                           '</tr>'
+                           '</table>')
+
+            # Проход по строкам файла CSV
+            html_output += '<table>\n'
+            count = 1
+            for row in csv_reader:
+                html_output += '  <tr>\n'
+                html_output += '    <th>' + str(count) + '</th>\n'
+                for cell in row:
+                    html_output += '    <th>' + str(cell) + '</th>\n'
+                html_output += '  </tr>\n'
+                count += 1
+            html_output += '</table>\n</body>\n</html>\n'
+        # Открытие файла для записи
+        with open('output.html', 'w', newline='', encoding='utf-8') as htmlfile:
+            htmlfile.write(html_output)
+        # Вывод HTML кода
+        return html_output
+
     def find_text(self):
         while True:
             user_input = input("Введите слово для поиска или 'выход' для выхода: ")
@@ -108,6 +122,7 @@ class PriceMachine():
                         if user_input in row[0].lower():
                             intermediate_row.append(row)
 
+                # Открытие файла для записи
                 with open('result_file.csv', 'w', newline='', encoding='utf-8') as res_file:
                     writer = csv.writer(res_file)
 
@@ -119,12 +134,7 @@ class PriceMachine():
                         print(row)
 
 
-    
 pm = PriceMachine()
 pm.load_prices()
 pm.find_text()
-'''
-    Логика работы программы
-'''
-
-print(pm.export_to_html())
+pm.export_to_html()
